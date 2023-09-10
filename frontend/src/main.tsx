@@ -1,9 +1,12 @@
+import { ChakraProvider } from '@chakra-ui/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Hello from './Index/Index'
+import App from './app'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <Hello message='HOLA'/>
+    <ChakraProvider>
+      <App/>
+    </ChakraProvider>
   </React.StrictMode>,
 )

@@ -4,8 +4,8 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 // todo: move to a better place
 const ACCESS_TOKEN_URL = "https://accounts.spotify.com/api/token";
-const SEARCH_ARTIST =
-  "https://api.spotify.com/v1/search?q=remaster%2520track%3ADoxy%2520artist%3AMiles%2520Davis&type=album";
+
+// TODO: take albums details from> https://developer.spotify.com/documentation/web-api/reference/get-multiple-albums
 
 const getToken = async () => {
   const { data } = await axios.post(
@@ -21,8 +21,34 @@ const getToken = async () => {
   return data.access_token;
 };
 
-const spotifySearch = async () => {
+const getAlbumsByIds = async (albumIds, accessToken) => {
+  // Define the API endpoint
+  const apiUrl = "https://api.spotify.com/v1/albums";
+
+  // Define the request headers, including the Authorization header with the access token
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+  };
+
+  try {
+    // Send the GET request using Axios
+    const response = await axios.get(`${apiUrl}?ids=${albumIds.join(",")}`, {
+      headers,
+    });
+
+    // Return the response data
+    return response.data;
+  } catch (error) {
+    // Handle any errors here
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
+const spotifySearch = async (searchValue) => {
   const token = await getToken();
+  const scapedSearchValue = encodeURIComponent(searchValue);
+  const SEARCH_ARTIST = `https://api.spotify.com/v1/search?q=${scapedSearchValue}&type=album`;
 
   const { data } = await axios.get(SEARCH_ARTIST, {
     headers: {
@@ -30,9 +56,11 @@ const spotifySearch = async () => {
     },
   });
 
-  return data;
+  const matchingAlbunIds = data.albums.items.map((album) => album.id);
+
+  const albunDetail = await getAlbumsByIds(matchingAlbunIds, token);
+
+  return albunDetail;
 };
 
-const getAlbums = () => {};
-
-module.exports = { getToken, getAlbums, spotifySearch };
+module.exports = { getToken, spotifySearch };
