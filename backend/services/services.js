@@ -45,6 +45,23 @@ const getAlbumsByIds = async (albumIds, accessToken) => {
   }
 };
 
+const mapInfoToFrontend = (info) => {
+  // i need img, name, duration
+
+  const infoToFrontend = info.map((album) => {
+    const data = {
+      name: album.name,
+      tracks: album.tracks.items.map(({ duration_ms, name }) => ({
+        name,
+        duration: duration_ms / 1000,
+      })),
+    };
+    return data;
+  });
+
+  return infoToFrontend;
+};
+
 const spotifySearch = async (searchValue) => {
   const token = await getToken();
   const scapedSearchValue = encodeURIComponent(searchValue);
@@ -58,9 +75,15 @@ const spotifySearch = async (searchValue) => {
 
   const matchingAlbunIds = data.albums.items.map((album) => album.id);
 
-  const albunDetail = await getAlbumsByIds(matchingAlbunIds, token);
+  const albumsDetail = await getAlbumsByIds(matchingAlbunIds, token);
 
-  return albunDetail;
+  const sortedAlbums = albumsDetail.albums.sort(
+    (a, b) => b.popularity - a.popularity
+  );
+  
+  const requiredInfo = mapInfoToFrontend(sortedAlbums);
+  console.log("requiredInfo: ", requiredInfo);
+  return requiredInfo;
 };
 
 module.exports = { getToken, spotifySearch };
