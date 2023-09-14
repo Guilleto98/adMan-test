@@ -17,6 +17,7 @@ interface SpotifySearchInputProps {
   onSearch: (query: string) => Promise<any[]>;
   albums: any[];
   setAlbums: React.Dispatch<React.SetStateAction<any[]>>;
+  toggleBackground: () => void;
 }
 
 const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
@@ -24,13 +25,14 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
   onSearch,
   albums,
   setAlbums,
+  toggleBackground
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = async () => {
     if (searchQuery.trim() !== "") {
+      setAlbums([])
       const results = await onSearch(searchQuery);
-      console.log(results);
       setAlbums(results);
     }
   };
@@ -38,6 +40,7 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSearch();
+      toggleBackground()
     }
   };
 
@@ -53,13 +56,20 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
 
   function formatDuration(duration: number) {
     const minutes = Math.floor(duration / 60);
-    const seconds = Math.floor(duration % 60);
+    const seconds = Math.ceil(duration % 60);
 
     return `${minutes}:${seconds}`;
   }
 
   return (
-    <Flex flexDir="column" alignItems="center" width="100%">
+    <Flex
+      flexDir="column"
+      alignItems="center"
+      width="100%"
+      minH="100vh"
+      justifyContent="flex-end"
+      pb="100px"
+    >
       <Input
         placeholder={placeholder}
         searchQuery={searchQuery}
@@ -91,6 +101,7 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
                     icon={<ChevronUpIcon />}
                     aria-label="Cerrar álbum"
                     colorScheme="blue"
+                    fontSize='lg'
                   />
                 ) : (
                   <IconButton
@@ -105,7 +116,7 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
                   {tracks.map((track: any, trackIndex: number) => (
                     <ListItem key={trackIndex}>
                       <Text>{track.name}</Text>
-                      <Text fontSize="sm" color="gray.500">
+                      <Text fontSize="lg" color="white">
                         Duración: {formatDuration(track.duration)}
                       </Text>
                     </ListItem>

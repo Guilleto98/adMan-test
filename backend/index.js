@@ -34,15 +34,21 @@ app.post("/api/search", async (req, res) => {
   const response = await spotifySearch(req.body.search);
   console.log(response)
   res.send(response);
+  try {
   connection.query(sql, [req.body.search], (err, result) => {
     if (err) {
-      console.log("Fail to insert on DB");
-      return;
+      console.error("Error al insertar en la base de datos:", err);
     } else {
-      console.log("Data inserted on DB");
+      console.log("Datos insertados en la base de datos");
     }
+    
+    // Cierra la conexión después de completar la consulta
+    connection.end();
   });
-  connection.end();
+} catch (error) {
+  console.error("Error inesperado:", error);
+}
+
 });
 
 
