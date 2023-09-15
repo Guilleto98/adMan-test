@@ -80,9 +80,8 @@ const spotifySearch = async (searchValue) => {
   const sortedAlbums = albumsDetail.albums.sort(
     (a, b) => b.popularity - a.popularity
   );
-  
+
   const requiredInfo = mapInfoToFrontend(sortedAlbums);
-  console.log("requiredInfo: ", requiredInfo);
   return requiredInfo;
 };
 

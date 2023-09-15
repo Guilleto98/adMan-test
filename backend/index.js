@@ -14,9 +14,9 @@ const PORT = 3000;
 
 connection.connect((error) => {
   if (error) {
-    console.error("Error de conexión a la base de datos:", error);
+    console.error("Error connecting with DB:", error);
   } else {
-    console.log("Conexión exitosa a la base de datos MySQL");
+    console.log("Successfully connected to DB");
   }
 });
 
@@ -25,28 +25,26 @@ app.use(bodyParser.json());
 
 app.get("/api/artist", async (req, res) => {
   const artist = await spotifySearch();
-  console.log(artist);
   res.send(artist);
 });
 
 app.post("/api/search", async (req, res) => {
   const response = await spotifySearch(req.body.search);
-  console.log(response);
 
   try {
     connection.query(insertQuery, [req.body.search], (err, result) => {
       if (err) {
-        console.error("Error al insertar en la base de datos:", err);
+        console.error("Error to add on DB:", err);
       } else {
-        console.log("Datos insertados en la base de datos");
+        console.log("Data insert on DB");
       }
       res.send(response);
     });
   } catch (error) {
-    console.error("Error inesperado:", error);
+    console.error("Error:", error);
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor en ejecución en el puerto ${PORT}`);
+  console.log(`Server running on PORT:${PORT}`);
 });
