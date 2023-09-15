@@ -10,10 +10,12 @@ const App = () => {
   const [currentBackground, setCurrentBackground] = useState(1);
   const backgrounds = [background, background2];
 
-  const toggleBackground = () => {
-    setCurrentBackground((prevBackground) =>
-      prevBackground === 1 ? 2 : 1
-    );
+  const toggleBackground = (hasData: boolean) => {
+    if(hasData){
+      setCurrentBackground(2)
+    }else{
+      setCurrentBackground(1)
+    }
   };
 
 

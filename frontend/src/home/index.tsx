@@ -1,23 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
   Text,
   Center,
   UnorderedList,
-  ListItem,
   IconButton,
   Collapse,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import Input from "../components/Input";
+import TrackListItem from "../components/ListItem";
 
 interface SpotifySearchInputProps {
   placeholder?: string;
   onSearch: (query: string) => Promise<any[]>;
   albums: any[];
   setAlbums: React.Dispatch<React.SetStateAction<any[]>>;
-  toggleBackground: () => void;
+  toggleBackground: (hasData: boolean) => void;
 }
 
 const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
@@ -25,13 +25,13 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
   onSearch,
   albums,
   setAlbums,
-  toggleBackground
+  toggleBackground,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = async () => {
     if (searchQuery.trim() !== "") {
-      setAlbums([])
+      setAlbums([]);
       const results = await onSearch(searchQuery);
       setAlbums(results);
     }
@@ -40,7 +40,6 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSearch();
-      toggleBackground()
     }
   };
 
@@ -60,6 +59,12 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
 
     return `${minutes}:${seconds}`;
   }
+
+  useEffect(() => {
+    const hasData = albums.length > 0;
+    toggleBackground(hasData);
+  }, [JSON.stringify(albums)]);
+
 
   return (
     <Flex
@@ -101,7 +106,7 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
                     icon={<ChevronUpIcon />}
                     aria-label="Cerrar álbum"
                     colorScheme="blue"
-                    fontSize='lg'
+                    fontSize="lg"
                   />
                 ) : (
                   <IconButton
@@ -113,14 +118,19 @@ const SpotifySearchInput: React.FC<SpotifySearchInputProps> = ({
               </Flex>
               <Collapse in={expandedAlbum === index}>
                 <UnorderedList>
-                  {tracks.map((track: any, trackIndex: number) => (
-                    <ListItem key={trackIndex}>
-                      <Text>{track.name}</Text>
-                      <Text fontSize="lg" color="white">
-                        Duración: {formatDuration(track.duration)}
-                      </Text>
-                    </ListItem>
-                  ))}
+                  {tracks.map(
+                    (
+                      track: { name: string; duration: number },
+                      trackIndex: number
+                    ) => (
+                      <TrackListItem
+                        trackName={track.name}
+                        trackDuration={track.duration}
+                        trackIndex={trackIndex}
+                        formatDuration={formatDuration}
+                      />
+                    )
+                  )}
                 </UnorderedList>
               </Collapse>
             </Box>
