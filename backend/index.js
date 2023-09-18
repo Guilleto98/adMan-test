@@ -3,6 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const { getToken, spotifySearch } = require("./services/services");
 const bodyParser = require("body-parser");
+const searchController = require('./controllers/searchController');
+const artistController = require('./controllers/artistController')
+
 
 const mysql = require("mysql2");
 const connection = require("./db");
@@ -23,27 +26,9 @@ connection.connect((error) => {
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get("/api/artist", async (req, res) => {
-  const artist = await spotifySearch();
-  res.send(artist);
-});
+app.get("/api/artist", artistController);
 
-app.post("/api/search", async (req, res) => {
-  const response = await spotifySearch(req.body.search);
-
-  try {
-    connection.query(insertQuery, [req.body.search], (err, result) => {
-      if (err) {
-        console.error("Error to add on DB:", err);
-      } else {
-        console.log("Data insert on DB");
-      }
-      res.send(response);
-    });
-  } catch (error) {
-    console.error("Error:", error);
-  }
-});
+app.post("/api/search", searchController);
 
 app.listen(PORT, () => {
   console.log(`Server running on PORT:${PORT}`);
